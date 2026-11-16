@@ -1,5 +1,9 @@
 # 网页表格采集器 Table Harvester
 
+**在线演示**：<https://table-harvester.onrender.com>
+
+> 免费实例 15 分钟无访问会休眠，第一次打开可能要等 50 秒左右。
+
 把公开网页里的表格抓下来，**清洗、去重、导出成 CSV / Excel**。
 命令行和网页界面两种用法，核心逻辑是一个可以当库调用的 `harvester.py`。
 
