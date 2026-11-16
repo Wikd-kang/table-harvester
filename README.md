@@ -112,6 +112,17 @@ table-harvester/
 └── requirements.txt
 ```
 
+## 部署
+
+Render 免费方案：
+
+1. New → Web Service，语言选 Python
+2. Build Command：`pip install -r requirements.txt`
+3. Start Command：`gunicorn app:app`
+4. 免费实例 15 分钟无访问休眠，冷启动约 50 秒
+
+注意抓取任务是内存缓存的，多实例部署要换成 Redis。
+
 ## 已知限制（如实写）
 
 - 不执行 JS，前端渲染的页面抓不到
