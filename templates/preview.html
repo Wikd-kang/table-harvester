@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>预览 · 网页表格采集器</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="wrap wide">
+    <header class="hero">
+      <h1>选一个表格</h1>
+      <p class="sub">同一个序号会在每个页面上各取一张表，导出时合并。选好之后点下面的按钮。</p>
+    </header>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in msgs %}
+        <div class="alert {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    {% for page in pages %}
+      <section class="card">
+        <h2 class="url">{{ page.url }}</h2>
+        {% if page.error %}
+          <p class="err-text">✗ {{ page.error }}</p>
+        {% else %}
+          {% for t in page.tables %}
+            {% set width = t.headers|length if t.headers and t.headers|select|list else (t.rows[0]|length if t.rows else 0) %}
+            <label class="tbl-pick">
+              <input type="radio" name="pick" form="exportForm" value="{{ loop.index0 }}"
+                     {% if page.tables|length == 1 and loop.first %}checked{% endif %}>
+              <span class="badge">#{{ loop.index0 }}</span>
+              <span class="meta">{{ t.rows|length }} 行 × {{ width }} 列</span>
+              {% if t.headers and t.headers|select|list %}
+                <span class="head">{{ t.headers[:5]|join(' / ') }}</span>
+              {% else %}
+                <span class="head muted">（无表头）</span>
+              {% endif %}
+            </label>
+
+            {% if loop.index0 == 0 %}
+            <div class="preview">
+              <table>
+                {% if t.headers and t.headers|select|list %}
+                <thead><tr>{% for h in t.headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+                {% endif %}
+                <tbody>
+                  {% for r in t.rows[:6] %}
+                  <tr>{% for c in r %}<td>{{ c }}</td>{% endfor %}</tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% if t.rows|length > 6 %}<p class="hint">只显示前 6 行，共 {{ t.rows|length }} 行</p>{% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </section>
+    {% endfor %}
+
+    {% if not empty %}
+    <form id="exportForm" class="card sticky" method="post" action="{{ url_for('export') }}">
+      <input type="hidden" name="job_id" value="{{ job_id }}">
+      <div class="row">
+        <label class="chk"><input type="checkbox" name="dedupe" value="1" checked> 去重</label>
+        <label class="key">按列去重（可选，列号从 0 开始，多列用逗号）
+          <input type="text" name="key" placeholder="例如 0 或 0,2">
+        </label>
+      </div>
+      <div class="row buttons">
+        <button type="submit" name="fmt" value="csv">下载 CSV</button>
+        <button type="submit" name="fmt" value="excel" class="alt">下载 Excel</button>
+        <a class="link" href="{{ url_for('index') }}">重新抓取</a>
+      </div>
+    </form>
+    {% endif %}
+  </main>
+</body>
+</html>

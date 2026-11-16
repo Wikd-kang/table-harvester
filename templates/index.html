@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>网页表格采集器</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <h1>网页表格采集器</h1>
+      <p class="sub">把公开网页里的表格抓下来，去重、导出 CSV / Excel。不执行 JS，不碰登录态。</p>
+    </header>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in msgs %}
+        <div class="alert {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form class="card" method="post" action="{{ url_for('preview') }}">
+      <label for="urls">网页地址（一行一个，可以填多个分页）</label>
+      <textarea id="urls" name="urls" rows="4" placeholder="https://example.com/list"></textarea>
+      <p class="hint">只支持服务端渲染的 HTML 表格。整页数据靠 JS 加载的站抓不到。</p>
+      <button type="submit">抓取并预览</button>
+    </form>
+
+    <section class="card tips">
+      <h2>能做什么</h2>
+      <ul>
+        <li>自动识别页面里所有 <code>&lt;table&gt;</code>，按数据量排序，主表排第一</li>
+        <li>表头识别：<code>&lt;thead&gt;</code> 或首行 <code>&lt;th&gt;</code>，都没有就按数据行处理</li>
+        <li>处理 colspan 造成的列错位，短行补空、长行对齐</li>
+        <li>整行去重，或按指定列去重（比如只有「姓名」重复就算重复）</li>
+        <li>多个分页 URL 可以合并成一张表再导出</li>
+        <li>CSV 带 UTF-8 BOM，Excel 直接双击不乱码；xlsx 带表头样式、冻结首行、自动筛选</li>
+      </ul>
+      <h2>不能做什么（如实说明）</h2>
+      <ul>
+        <li>不执行 JavaScript —— React / Vue 那种前端渲染的页面抓不到数据</li>
+        <li>不处理登录、验证码、反爬</li>
+        <li>不自动翻页（分页地址要你自己填）</li>
+        <li>只抓公开数据，请自行确认对目标站点的抓取是合规的</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
