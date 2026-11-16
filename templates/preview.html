@@ -64,9 +64,7 @@
       <input type="hidden" name="job_id" value="{{ job_id }}">
       <div class="row">
         <label class="chk"><input type="checkbox" name="dedupe" value="1" checked> 去重</label>
-        <label class="key">按列去重（可选，列号从 0 开始，多列用逗号）
-          <input type="text" name="key" placeholder="例如 0 或 0,2">
-        </label>
+        <input type="text" name="key" class="key" placeholder="按列去重（可选）：列号从 0 开始，多列用逗号，例如 0 或 0,2">
       </div>
       <div class="row buttons">
         <button type="submit" name="fmt" value="csv">下载 CSV</button>
